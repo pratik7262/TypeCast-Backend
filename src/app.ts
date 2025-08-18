@@ -1,6 +1,7 @@
 import express from "express";
 import type { Response, Request } from "express";
 import dotenv from "dotenv";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -13,5 +14,7 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
 });
+
+app.use("/api/user", userRouter);
 
 export default app;
