@@ -2,19 +2,19 @@ import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { error } from "console";
 import User from "../models/user.model.js";
-import { generateToken } from "../utils/utils.js";
+import { errorHandler, generateToken, getUserId } from "../utils/utils.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      return errorHandler(res, 400, "All fields are required");
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+      return errorHandler(res, 400, "Email already exists");
     }
 
     const user = await User.create({ name, email, password });
@@ -28,7 +28,8 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };
 
@@ -38,12 +39,12 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return errorHandler(res, 400, "Invalid credentials");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return errorHandler(res, 400, "Invalid credentials");
     }
 
     res.json({
@@ -54,29 +55,18 @@ export const login = async (req: Request, res: Response) => {
       token: generateToken(user.id),
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };
 
 export const getUSer = async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      throw error("user is undefined");
-    }
-
-    let userId: string;
-
-    if (typeof req.user === "string") {
-      userId = req.user;
-    } else if ("id" in req.user) {
-      userId = (req.user as any).id;
-    } else {
-      throw error("Invalid user object");
-    }
-
-    const user = await User.findById(userId).select("-password"); // Auth Middleware remaining
+    const userId = getUserId(req);
+    const user = await User.findById(userId).select("-password");
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };

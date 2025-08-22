@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Snapshot from "../models/snapshot.model.js";
+import { errorHandler } from "../utils/utils.js";
 
 export const createSnapshot = async (req: Request, res: Response) => {
   try {
@@ -13,7 +14,8 @@ export const createSnapshot = async (req: Request, res: Response) => {
 
     return res.status(201).json({ success: true, snapshot });
   } catch (error) {
-    return res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };
 
@@ -26,7 +28,8 @@ export const getLatestSnapshot = async (req: Request, res: Response) => {
 
     return res.status(200).json({ success: true, snapshot });
   } catch (error) {
-    return res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };
 
@@ -40,6 +43,7 @@ export const getAllSnapshots = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, snapshots });
   } catch (error) {
-    return res.status(500).json({ message: "Server error" });
+    console.log(error);
+    return errorHandler(res);
   }
 };

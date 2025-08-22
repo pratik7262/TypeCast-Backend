@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import Document from "../models/document.model.js";
-import { getUserId } from "../utils/utils.js";
+import { errorHandler, getUserId } from "../utils/utils.js";
 
 export const createDocument = async (req: Request, res: Response) => {
   try {
@@ -19,7 +19,7 @@ export const createDocument = async (req: Request, res: Response) => {
       .json({ success: true, message: "Documment created successfully" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error" });
+    return errorHandler(res);
   }
 };
 
@@ -34,7 +34,7 @@ export const getDocument = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error" });
+    return errorHandler(res);
   }
 };
 
@@ -49,7 +49,7 @@ export const getDocuments = async (req: Request, res: Response) => {
     return res.status(200).json({ success: true, documents });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Server error" });
+    return errorHandler(res);
   }
 };
 
@@ -74,7 +74,7 @@ export const updateTitle = async (req: Request, res: Response) => {
     return res.status(200).json({ success: true, document: updatedDoc });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Server error" });
+    return errorHandler(res);
   }
 };
 
@@ -105,7 +105,7 @@ export const addCollaborator = async (req: Request, res: Response) => {
     return res.status(200).json({ success: true, document: updatedDoc });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Server error" });
+    return errorHandler(res);
   }
 };
 
@@ -121,6 +121,7 @@ export const deleteDocument = async (req: Request, res: Response) => {
 
     res.json({ success: true, message: "Document deleted successfully" });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    console.log(error);
+    return errorHandler(res);
   }
 };

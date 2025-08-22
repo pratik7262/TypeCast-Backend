@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { error } from "console";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 
 dotenv.config();
 
@@ -27,4 +27,12 @@ export const getUserId = (req: Request) => {
   }
 
   return userId;
+};
+
+export const errorHandler = (
+  res: Response,
+  status = 500,
+  message = "Internal Server Error"
+) => {
+  return res.status(status).json({ success: false, message });
 };
